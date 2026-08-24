@@ -1,0 +1,39 @@
+### Health
+GET http://localhost:18080/health
+
+### Create order
+POST http://localhost:18080/api/orders
+Content-Type: application/json
+
+{
+  "user_id": 1,
+  "symbol": "RELIANCE",
+  "side": "BUY",
+  "order_type": "LIMIT",
+  "quantity": 100,
+  "price": 145050,
+  "idempotency_key": "demo-order-001"
+}
+
+### List orders
+GET http://localhost:18080/api/orders
+
+### Get positions
+GET http://localhost:18080/api/positions
+
+### Get P&L
+GET http://localhost:18080/api/pnl?user_id=1&symbol=RELIANCE
+
+### Get risk
+GET http://localhost:18080/api/risk?user_id=1
+
+### Update risk limits
+PUT http://localhost:18080/api/risk/limits
+Content-Type: application/json
+
+{
+  "user_id": 1,
+  "max_order_quantity": 1000,
+  "max_position_quantity": 2000,
+  "max_notional": 10000000
+}

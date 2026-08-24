@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tradeflow-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-tradeflow}
+      POSTGRES_USER: ${DB_USER:-tradeflow}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-tradeflow}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-tradeflow} -d ${DB_NAME:-tradeflow}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tradeflow-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-tradeflow}
+      DB_USER: ${DB_USER:-tradeflow}
+      DB_PASSWORD: ${DB_PASSWORD:-tradeflow}
+    ports:
+      - "18080:18080"
+    restart: unless-stopped
+    command: ["/app/build/tradeflow_app"]
+
+volumes:
+  postgres_data:
